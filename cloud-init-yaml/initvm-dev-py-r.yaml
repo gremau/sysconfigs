@@ -1,0 +1,38 @@
+#cloud-config
+# Ubuntu VM with Python and R, based on:
+# https://greg.pronghorns.net/research-notebook/computing/virtual-machine-setup/
+# R packages come as prebuilt binaries from r2u: https://github.com/eddelbuettel/r2u
+#
+# Usage (Multipass):
+#   multipass launch --name dev --cpus 2 --memory 4G --disk 20G --cloud-init cloud-init.yaml
+# Progress:  multipass exec dev -- tail -f /var/log/cloud-init-output.log
+# Done when: multipass exec dev -- cloud-init status --wait
+
+package_update: true
+package_upgrade: true
+
+packages:
+  # Python
+  - python3-full
+  - python3-pip
+  - python3-pip-whl
+  # Downloads (r2u setup script, uv installer)
+  - wget
+  - curl
+  - ca-certificates
+
+runcmd:
+  # --- R via r2u: adds CRAN R + r2u apt repos, pins r2u, enables bspm ---
+  # Script name unpacks $(lsb_release -cs) to follow this VM's Ubuntu codename (e.g. add_cranapt_resolute.sh)
+  - wget -qO /root/add_cranapt.sh "https://raw.githubusercontent.com/eddelbuettel/r2u/master/inst/scripts/add_cranapt_$(lsb_release -cs).sh"
+  - bash /root/add_cranapt.sh
+  # Prebuilt tidyverse; with bspm, install.packages() also installs binaries via apt
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y r-base-dev r-cran-tidyverse
+
+  # --- Python: uv for the default user (optional alternative to venv+pip) ---
+  - su - ubuntu -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
+
+  # --- Coding agent (optional): uncomment to install OpenCode ---
+  # - su - ubuntu -c 'curl -fsSL https://opencode.ai/install | bash'
+
+final_message: "Python + R VM ready after $UPTIME seconds."
