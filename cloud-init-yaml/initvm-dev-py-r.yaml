@@ -27,7 +27,7 @@ runcmd:
   - wget -qO /root/add_cranapt.sh "https://raw.githubusercontent.com/eddelbuettel/r2u/master/inst/scripts/add_cranapt_$(lsb_release -cs).sh"
   - bash /root/add_cranapt.sh
   # Prebuilt tidyverse; with bspm, install.packages() also installs binaries via apt
-  - DEBIAN_FRONTEND=noninteractive apt-get install -y r-base-dev r-cran-tidyverse
+  - DEBIAN_FRONTEND=noninteractive apt-get install -y r-base r-base-dev r-cran-tidyverse
 
   # --- Python: uv for the default user (optional alternative to venv+pip) ---
   - su - ubuntu -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
