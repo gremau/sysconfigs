@@ -22,11 +22,12 @@ packages:
   - ca-certificates
 
 runcmd:
-  # --- R via r2u: adds CRAN R + r2u apt repos, pins r2u, enables bspm ---
+  # --- Install R via r2u repository scripts: adds CRAN R + r2u apt repos, pins r2u, enables bspm ---
   # Script name unpacks $(lsb_release -cs) to follow this VM's Ubuntu codename (e.g. add_cranapt_resolute.sh)
+  # bspm routes install.packages to the pinned r2u repository of prebuilt CRAN packages
   - wget -qO /root/add_cranapt.sh "https://raw.githubusercontent.com/eddelbuettel/r2u/master/inst/scripts/add_cranapt_$(lsb_release -cs).sh"
   - bash /root/add_cranapt.sh
-  # Prebuilt tidyverse; with bspm, install.packages() also installs binaries via apt
+  # Install a basic R system and tidyverse
   - DEBIAN_FRONTEND=noninteractive apt-get install -y r-base r-base-dev r-cran-tidyverse
 
   # --- Python: uv for the default user (optional alternative to venv+pip) ---
