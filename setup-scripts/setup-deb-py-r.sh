@@ -7,13 +7,16 @@
 #
 # Usage:  sudo bash setup-debian.sh [username]   (default: the user who ran sudo)
 
-set -euo pipefail
+set -euo pipefail # Stop on first/any error
 
+# Require root
 if [[ $EUID -ne 0 ]]; then
   echo "Run as root: sudo bash $0 [username]" >&2
   exit 1
 fi
+# Choose uv user
 TARGET_USER="${1:-${SUDO_USER:-}}"
+# Refuse empty or root user
 if [[ -z "$TARGET_USER" || "$TARGET_USER" == "root" ]]; then
   echo "Give a non-root username: sudo bash $0 <username>" >&2
   exit 1
@@ -26,8 +29,8 @@ apt-get upgrade -y
 # --- Python ---
 apt-get install -y python3-full python3-pip python3-pip-whl curl ca-certificates
 
-# --- R + prebuilt tidyverse from Debian ---
-apt-get install -y r-base r-base-dev r-cran-tidyverse
+# --- R + prebuilt tidyverse from Debian (note that these may lag behind CRAN) ---
+apt-get install -y r-base r-base-dev r-recommended r-cran-tidyverse
 
 # --- uv for the target user ---
 su - "$TARGET_USER" -c 'curl -LsSf https://astral.sh/uv/install.sh | sh'
